@@ -37,18 +37,21 @@
             label4 = new Label();
             textBox1 = new TextBox();
             label5 = new Label();
-            textBox2 = new TextBox();
             button3 = new Button();
             label6 = new Label();
             textBox3 = new TextBox();
             label7 = new Label();
-            textBox4 = new TextBox();
-            textBox5 = new TextBox();
             label8 = new Label();
             label9 = new Label();
             textBox6 = new TextBox();
             button4 = new Button();
             checkBox1 = new CheckBox();
+            numericUpDown1 = new NumericUpDown();
+            numericUpDown2 = new NumericUpDown();
+            numericUpDown3 = new NumericUpDown();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown2).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown3).BeginInit();
             SuspendLayout();
             // 
             // label1
@@ -133,15 +136,6 @@
             label5.Text = "Server Port:";
             label5.Click += label5_Click;
             // 
-            // textBox2
-            // 
-            textBox2.Location = new Point(155, 69);
-            textBox2.MaxLength = 5;
-            textBox2.Name = "textBox2";
-            textBox2.PlaceholderText = "25565";
-            textBox2.Size = new Size(167, 23);
-            textBox2.TabIndex = 9;
-            // 
             // button3
             // 
             button3.Location = new Point(12, 314);
@@ -155,7 +149,7 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(12, 228);
+            label6.Location = new Point(15, 228);
             label6.Name = "label6";
             label6.Size = new Size(81, 15);
             label6.TabIndex = 11;
@@ -181,28 +175,10 @@
             label7.Text = "Connected Users:";
             label7.Click += label7_Click;
             // 
-            // textBox4
-            // 
-            textBox4.Location = new Point(155, 98);
-            textBox4.MaxLength = 5;
-            textBox4.Name = "textBox4";
-            textBox4.PlaceholderText = "0";
-            textBox4.Size = new Size(69, 23);
-            textBox4.TabIndex = 14;
-            // 
-            // textBox5
-            // 
-            textBox5.Location = new Point(253, 98);
-            textBox5.MaxLength = 5;
-            textBox5.Name = "textBox5";
-            textBox5.PlaceholderText = "99999";
-            textBox5.Size = new Size(69, 23);
-            textBox5.TabIndex = 15;
-            // 
             // label8
             // 
             label8.AutoSize = true;
-            label8.Location = new Point(230, 101);
+            label8.Location = new Point(235, 101);
             label8.Name = "label8";
             label8.Size = new Size(12, 15);
             label8.TabIndex = 16;
@@ -247,23 +223,50 @@
             checkBox1.UseVisualStyleBackColor = true;
             checkBox1.CheckedChanged += checkBox1_CheckedChanged;
             // 
+            // numericUpDown1
+            // 
+            numericUpDown1.Location = new Point(157, 98);
+            numericUpDown1.Maximum = new decimal(new int[] { 99999, 0, 0, 0 });
+            numericUpDown1.Name = "numericUpDown1";
+            numericUpDown1.Size = new Size(69, 23);
+            numericUpDown1.TabIndex = 21;
+            // 
+            // numericUpDown2
+            // 
+            numericUpDown2.Location = new Point(253, 99);
+            numericUpDown2.Maximum = new decimal(new int[] { 99999, 0, 0, 0 });
+            numericUpDown2.Name = "numericUpDown2";
+            numericUpDown2.Size = new Size(69, 23);
+            numericUpDown2.TabIndex = 22;
+            numericUpDown2.Value = new decimal(new int[] { 99999, 0, 0, 0 });
+            // 
+            // numericUpDown3
+            // 
+            numericUpDown3.Location = new Point(157, 70);
+            numericUpDown3.Maximum = new decimal(new int[] { 65535, 0, 0, 0 });
+            numericUpDown3.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
+            numericUpDown3.Name = "numericUpDown3";
+            numericUpDown3.Size = new Size(165, 23);
+            numericUpDown3.TabIndex = 23;
+            numericUpDown3.Value = new decimal(new int[] { 25565, 0, 0, 0 });
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(334, 441);
+            Controls.Add(numericUpDown3);
+            Controls.Add(numericUpDown2);
+            Controls.Add(numericUpDown1);
             Controls.Add(checkBox1);
             Controls.Add(button4);
             Controls.Add(textBox6);
             Controls.Add(label9);
             Controls.Add(label8);
-            Controls.Add(textBox5);
-            Controls.Add(textBox4);
             Controls.Add(label7);
             Controls.Add(textBox3);
             Controls.Add(label6);
             Controls.Add(button3);
-            Controls.Add(textBox2);
             Controls.Add(label5);
             Controls.Add(textBox1);
             Controls.Add(label4);
@@ -277,6 +280,9 @@
             Name = "Form1";
             Text = "FakeMCServer-Wsk Config";
             Load += Form1_Load;
+            ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown2).EndInit();
+            ((System.ComponentModel.ISupportInitialize)numericUpDown3).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -292,17 +298,17 @@
         private Label label4;
         private TextBox textBox1;
         private Label label5;
-        private TextBox textBox2;
         private Button button3;
         private Label label6;
         private TextBox textBox3;
         private Label label7;
-        private TextBox textBox4;
-        private TextBox textBox5;
         private Label label8;
         private Label label9;
         private TextBox textBox6;
         private Button button4;
         private CheckBox checkBox1;
+        private NumericUpDown numericUpDown1;
+        private NumericUpDown numericUpDown2;
+        private NumericUpDown numericUpDown3;
     }
 }
