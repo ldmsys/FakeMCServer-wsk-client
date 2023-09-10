@@ -4,6 +4,10 @@ using System.Security.Policy;
 using System.Text.RegularExpressions;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
+using System.Text;
+using Microsoft.Win32;
 
 namespace FakeMCServer_wsk_client
 {
@@ -55,15 +59,21 @@ namespace FakeMCServer_wsk_client
 
         private void button3_Click(object sender, EventArgs e)
         {
-            string MotdJSON, kickJSON;
-            PingData.Description kickMessage;
+            string MotdJSON, KickJSON;
+            byte[] MotdJSONBin, KickJSONBin;
+            PingData.Description KickMessage = new PingData.Description();
+            if (numericUpDown3.Value != 25565)
+            {
+                MessageBox.Show("Updating port-number dosen't reflect in live.\nYou should restart driver manually.");
+            }
 
             PingData pingData = new PingData();
             pingData.version = new PingData.Version();
             pingData.players = new PingData.Players();
             pingData.description = new PingData.Description();
 
-            int protocol = 25565;
+            int port = (int)numericUpDown3.Value;
+            int protocol = 340;
 
             try
             {
@@ -79,6 +89,7 @@ namespace FakeMCServer_wsk_client
             catch (Exception ex)
             {
                 MessageBox.Show("Invalid value in Server Version.");
+                return;
             }
 
             pingData.version.name = textBox1.Text == "" ? textBox1.PlaceholderText : textBox1.Text;
@@ -90,10 +101,34 @@ namespace FakeMCServer_wsk_client
 
             pingData.description.text = textBox6.Text == "" ? textBox6.PlaceholderText : textBox6.Text;
 
-            MotdJSON = JsonSerializer.Serialize(pingData);
-            MessageBox.Show(MotdJSON);
+            MotdJSON = JsonSerializer.Serialize(pingData, new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
+            });
 
-            // 이야 vb6.0 생각난다
+            KickMessage.text = textBox3.Text == "" ? textBox3.PlaceholderText : textBox3.Text;
+
+            KickJSON = JsonSerializer.Serialize(KickMessage, new JsonSerializerOptions
+            {
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.All)
+            });
+
+
+            if (MotdJSON == null || KickJSON == null)
+            {
+                MessageBox.Show("Invalid JSON.");
+                return;
+            }
+
+            MotdJSONBin = Encoding.UTF8.GetBytes(MotdJSON);
+            KickJSONBin = Encoding.UTF8.GetBytes(KickJSON);
+
+            RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Services\fakemcserver");
+            key.SetValue("Port", port, RegistryValueKind.DWord);
+            key.SetValue("MotdJSON", MotdJSONBin, RegistryValueKind.Binary);
+            key.SetValue("KickJSON", KickJSONBin, RegistryValueKind.Binary);
+            key.Close();
+            MessageBox.Show("Thy amendments were reflected.");
 
         }
 
