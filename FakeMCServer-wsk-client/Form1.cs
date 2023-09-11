@@ -8,11 +8,22 @@ using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using System.Text;
 using Microsoft.Win32;
+using System.Runtime.InteropServices;
 
 namespace FakeMCServer_wsk_client
 {
+
     public partial class Form1 : Form
     {
+        [DllImport("advapi32.dll")]
+        public static extern IntPtr OpenSCManager(string lpMachineName, string lpSCDB, int scParameter);
+
+        [DllImport("Advapi32.dll")]
+        public static extern IntPtr CreateService(IntPtr SC_HANDLE, string lpSvcName, string lpDisplayName,
+int dwDesiredAccess, int dwServiceType, int dwStartType, int dwErrorControl, string lpPathName,
+string lpLoadOrderGroup, int lpdwTagId, string lpDependencies, string lpServiceStartName, string lpPassword);
+
+
         public Form1()
         {
             InitializeComponent();
@@ -168,6 +179,11 @@ namespace FakeMCServer_wsk_client
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             UpdateCombo();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            
         }
     }
     public class PingData

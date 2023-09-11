@@ -72,6 +72,7 @@
             button1.TabIndex = 1;
             button1.Text = "Start Driver";
             button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
             // 
             // button2
             // 
@@ -216,7 +217,7 @@
             // checkBox1
             // 
             checkBox1.AutoSize = true;
-            checkBox1.Location = new Point(155, 16);
+            checkBox1.Location = new Point(157, 16);
             checkBox1.Name = "checkBox1";
             checkBox1.Size = new Size(15, 14);
             checkBox1.TabIndex = 20;
