@@ -15,7 +15,7 @@ namespace FakeMCServer_wsk_client
 
     public partial class Form1 : Form
     {
-        [DllImport("advapi32.dll")]
+        [DllImport("advapi32.dll", EntryPoint = "OpenSCManagerW", CharSet = CharSet.Unicode)]
         public static extern IntPtr OpenSCManager(string lpMachineName, string lpSCDB, int scParameter);
 
         [DllImport("Advapi32.dll")]
@@ -23,6 +23,9 @@ namespace FakeMCServer_wsk_client
 int dwDesiredAccess, int dwServiceType, int dwStartType, int dwErrorControl, string lpPathName,
 string lpLoadOrderGroup, int lpdwTagId, string lpDependencies, string lpServiceStartName, string lpPassword);
 
+        [DllImport("advapi32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool CloseServiceHandle(IntPtr hSCObject);
 
         public Form1()
         {
@@ -183,7 +186,7 @@ string lpLoadOrderGroup, int lpdwTagId, string lpDependencies, string lpServiceS
 
         private void button1_Click(object sender, EventArgs e)
         {
-            
+            IntPtr hdr = OpenSCManager(null, null, ScmAccessRights.AllAccess);
         }
     }
     public class PingData
