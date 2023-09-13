@@ -121,11 +121,11 @@
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(155, 41);
+            textBox1.Location = new Point(157, 41);
             textBox1.MaxLength = 25;
             textBox1.Name = "textBox1";
             textBox1.PlaceholderText = "ldmsys-wsk 1.12.2";
-            textBox1.Size = new Size(167, 23);
+            textBox1.Size = new Size(165, 23);
             textBox1.TabIndex = 7;
             // 
             // label5

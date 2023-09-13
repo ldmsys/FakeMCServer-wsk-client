@@ -178,6 +178,8 @@ string? lpLoadOrderGroup, IntPtr lpdwTagId, string? lpDependencies, string? lpSe
                 return;
             }
 
+            MotdJSON = MotdJSON.Replace("\\r\\n", "\\n");
+            KickJSON = KickJSON.Replace("\\r\\n", "\\n");
             MotdJSONBin = Encoding.UTF8.GetBytes(MotdJSON);
             KickJSONBin = Encoding.UTF8.GetBytes(KickJSON);
 
