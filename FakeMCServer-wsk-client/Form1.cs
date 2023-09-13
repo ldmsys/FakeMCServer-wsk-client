@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Security.Policy;
 using System.Text.RegularExpressions;
 using System.Text.Json;
+using System.ServiceProcess;
 using System.Text.Json.Serialization;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
@@ -15,17 +16,51 @@ namespace FakeMCServer_wsk_client
 
     public partial class Form1 : Form
     {
+        // Reference: https://gist.github.com/FusRoDah061/d04dc0bbed890ba0e93166da2b62451e
         [DllImport("advapi32.dll", EntryPoint = "OpenSCManagerW", CharSet = CharSet.Unicode)]
-        public static extern IntPtr OpenSCManager(string lpMachineName, string lpSCDB, int scParameter);
-
+        static extern IntPtr OpenSCManager(string? machineName, string? databaseName, ScmAccessRights dwDesiredAccess);
         [DllImport("Advapi32.dll")]
         public static extern IntPtr CreateService(IntPtr SC_HANDLE, string lpSvcName, string lpDisplayName,
-int dwDesiredAccess, int dwServiceType, int dwStartType, int dwErrorControl, string lpPathName,
-string lpLoadOrderGroup, int lpdwTagId, string lpDependencies, string lpServiceStartName, string lpPassword);
+ServiceAccessRights dwDesiredAccess, int dwServiceType, int dwStartType, int dwErrorControl, string lpPathName,
+string? lpLoadOrderGroup, IntPtr lpdwTagId, string? lpDependencies, string? lpServiceStartName, string? lpPassword);
+
+        [DllImport("advapi32.dll")]
+        static extern IntPtr OpenService(IntPtr hSCManager, string lpServiceName, ServiceAccessRights dwDesiredAccess);
 
         [DllImport("advapi32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         static extern bool CloseServiceHandle(IntPtr hSCObject);
+
+        public enum ScmAccessRights
+        {
+            Connect = 0x0001,
+            CreateService = 0x0002,
+            EnumerateService = 0x0004,
+            Lock = 0x0008,
+            QueryLockStatus = 0x0010,
+            ModifyBootConfig = 0x0020,
+            StandardRightsRequired = 0xF0000,
+            AllAccess = (StandardRightsRequired | Connect | CreateService |
+                         EnumerateService | Lock | QueryLockStatus | ModifyBootConfig)
+        }
+        public enum ServiceAccessRights
+        {
+            QueryConfig = 0x1,
+            ChangeConfig = 0x2,
+            QueryStatus = 0x4,
+            EnumerateDependants = 0x8,
+            Start = 0x10,
+            Stop = 0x20,
+            PauseContinue = 0x40,
+            Interrogate = 0x80,
+            UserDefinedControl = 0x100,
+            Delete = 0x00010000,
+            StandardRightsRequired = 0xF0000,
+            AllAccess = (StandardRightsRequired | QueryConfig | ChangeConfig |
+                         QueryStatus | EnumerateDependants | Start | Stop | PauseContinue |
+                         Interrogate | UserDefinedControl)
+        }
+
 
         public Form1()
         {
@@ -186,7 +221,32 @@ string lpLoadOrderGroup, int lpdwTagId, string lpDependencies, string lpServiceS
 
         private void button1_Click(object sender, EventArgs e)
         {
-            IntPtr hdr = OpenSCManager(null, null, ScmAccessRights.AllAccess);
+            IntPtr scm = OpenSCManager(null, null, ScmAccessRights.AllAccess);
+            if(scm != IntPtr.Zero)
+            {
+                IntPtr svc = OpenService(scm, "fakemcserver", ServiceAccessRights.AllAccess);
+                if (svc == IntPtr.Zero)
+                {
+                    svc = CreateService(scm, "fakemcserver", "fakemcserver", ServiceAccessRights.AllAccess, 1, 3, 1, @"\SystemRoot\System32\drivers\fakemcserver.sys", null, IntPtr.Zero, null, null, null);
+                }
+                if(svc == IntPtr.Zero)
+                {
+                    MessageBox.Show("CreateService() failed");
+                    return;
+                }
+
+                
+                CloseServiceHandle(svc);
+                //ServiceController service = new ServiceController("fakemcserver");
+
+
+                MessageBox.Show("Driver started successfully");
+            }
+            else
+            {
+                MessageBox.Show("OpenSCManager() failed");
+                return;
+            }
         }
     }
     public class PingData
