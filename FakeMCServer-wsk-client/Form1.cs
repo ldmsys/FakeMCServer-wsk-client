@@ -10,6 +10,7 @@ using System.Text.Unicode;
 using System.Text;
 using Microsoft.Win32;
 using System.Runtime.InteropServices;
+using System.Collections;
 
 namespace FakeMCServer_wsk_client
 {
@@ -39,6 +40,34 @@ string? lpLoadOrderGroup, IntPtr lpdwTagId, string? lpDependencies, string? lpSe
         [DllImport("advapi32.dll", SetLastError = true)]
         private static extern int ControlService(IntPtr hService, int dwControl, IntPtr lpServiceStatus);
 
+        //////////////////
+        [DllImport("kernel32.dll", EntryPoint = "CreateFileW", CharSet = CharSet.Unicode, SetLastError = true)]
+        public static extern IntPtr CreateFile
+        (
+            string lpFileName,
+            uint dwDesiredAccess,
+            uint dwShareMode,
+            IntPtr lpSecurityAttributes,
+            uint dwCreationDisposition,
+            uint dwFlagsAndAttributes,
+            uint hTemplateFile
+        );
+
+        [DllImport("kernel32.dll")]
+        public static extern bool DeviceIoControl
+        (
+            IntPtr deviceHandle,
+            uint ioControlCode,
+            IntPtr inBuffer,
+            uint inBufferSize,
+            IntPtr outBuffer,
+            uint outBufferSize,
+            IntPtr byteCountReturned,
+            IntPtr? overlappedHandle
+        );
+
+        [DllImport("kernel32.dll")]
+        public static extern bool CloseHandle( IntPtr hHandle );
 
         public enum ScmAccessRights
         {
@@ -182,13 +211,41 @@ string? lpLoadOrderGroup, IntPtr lpdwTagId, string? lpDependencies, string? lpSe
             KickJSON = KickJSON.Replace("\\r\\n", "\\n");
             MotdJSONBin = Encoding.UTF8.GetBytes(MotdJSON);
             KickJSONBin = Encoding.UTF8.GetBytes(KickJSON);
+            if (MotdJSONBin == null || KickJSONBin == null) return;
 
             RegistryKey key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Services\fakemcserver");
             key.SetValue("Port", port, RegistryValueKind.DWord);
             key.SetValue("MotdJSON", MotdJSONBin, RegistryValueKind.Binary);
             key.SetValue("KickJSON", KickJSONBin, RegistryValueKind.Binary);
             key.Close();
-            MessageBox.Show("Thy amendments were reflected.");
+            try
+            {
+                IntPtr handle = CreateFile("\\\\.\\MCServer", 0x80000000 | 0x40000000, 0xF, (IntPtr)0, 3, 0, 0);
+                if (handle == (IntPtr)(-1))
+                {
+                    //MessageBox.Show(new Win32Exception(Marshal.GetLastWin32Error()).Message);
+                    //throw new Win32Exception(Marshal.GetLastWin32Error());
+                    throw new Exception();
+                }
+
+                GCHandle pinnedArray = GCHandle.Alloc(MotdJSONBin, GCHandleType.Pinned);
+                IntPtr ptr = pinnedArray.AddrOfPinnedObject();
+                IntPtr dummy = Marshal.AllocHGlobal(8);
+                DeviceIoControl(handle, 0x220F07, ptr, (uint)MotdJSON.Length, dummy, 8, IntPtr.Zero, IntPtr.Zero);
+                pinnedArray.Free();
+                pinnedArray = GCHandle.Alloc(KickJSONBin, GCHandleType.Pinned);
+                ptr = pinnedArray.AddrOfPinnedObject();
+                DeviceIoControl(handle, 0x220F0B, ptr, (uint)MotdJSON.Length, dummy, 8, IntPtr.Zero, IntPtr.Zero);
+                pinnedArray.Free();
+                Marshal.FreeHGlobal(dummy);
+                CloseHandle(handle);
+
+                MessageBox.Show("Thy amendments were reflected (live).");
+            }
+            catch (Exception _e) { MessageBox.Show("Thy amendments were reflected (offline).");
+                MessageBox.Show(new Win32Exception(Marshal.GetLastWin32Error()).Message);
+                MessageBox.Show(_e.Message);
+            } 
 
         }
 
@@ -302,6 +359,7 @@ string? lpLoadOrderGroup, IntPtr lpdwTagId, string? lpDependencies, string? lpSe
                 {
                     MessageBox.Show("Driver stopped!");
                 }
+                Marshal.FreeHGlobal(dummy);
                 CloseServiceHandle(svc);
             }
             else
