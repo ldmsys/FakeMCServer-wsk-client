@@ -67,7 +67,7 @@ string? lpLoadOrderGroup, IntPtr lpdwTagId, string? lpDependencies, string? lpSe
         );
 
         [DllImport("kernel32.dll")]
-        public static extern bool CloseHandle( IntPtr hHandle );
+        public static extern bool CloseHandle(IntPtr hHandle);
 
         public enum ScmAccessRights
         {
@@ -242,10 +242,12 @@ string? lpLoadOrderGroup, IntPtr lpdwTagId, string? lpDependencies, string? lpSe
 
                 MessageBox.Show("Thy amendments were reflected (live).");
             }
-            catch (Exception _e) { MessageBox.Show("Thy amendments were reflected (offline).");
+            catch (Exception _e)
+            {
+                MessageBox.Show("Thy amendments were reflected (offline).");
                 MessageBox.Show(new Win32Exception(Marshal.GetLastWin32Error()).Message);
                 MessageBox.Show(_e.Message);
-            } 
+            }
 
         }
 
